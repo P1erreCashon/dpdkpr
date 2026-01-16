@@ -92,6 +92,11 @@ New Features
   * Introduced ``rte_flow_parser`` as an optional library to convert the
     testpmd's ``flow`` CLI commands into ``rte_flow`` structures.
 
+* **Updated the cmdline library.**
+
+  The ``rdline`` function in the cmdline library will now
+  to clear screen when fed with Control+L.
+
 
 Removed Items
 -------------
