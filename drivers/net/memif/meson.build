@@ -1,12 +1,39 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2018-2019 Cisco Systems, Inc.  All rights reserved.
+# Copyright(c) 2017 Intel Corporation
 
-if not is_linux
-	build = false
-	reason = 'only supported on Linux'
+if arch_subdir == 'riscv'
+    build = false
+    reason = 'not supported on RISC-V'
+    subdir_done()
 endif
 
-sources = files('rte_eth_memif.c',
-		'memif_socket.c')
+cflags += ['-DRTE_LIBRTE_IXGBE_BYPASS']
 
-deps += ['hash']
+subdir('base')
+objs = [base_objs]
+
+sources = files(
+	'ixgbe_82599_bypass.c',
+	'ixgbe_bypass.c',
+	'ixgbe_ethdev.c',
+	'ixgbe_fdir.c',
+	'ixgbe_flow.c',
+	'ixgbe_ipsec.c',
+	'ixgbe_pf.c',
+	'ixgbe_rxtx.c',
+	'ixgbe_tm.c',
+	'ixgbe_vf_representor.c',
+	'rte_pmd_ixgbe.c'
+)
+
+deps += ['hash', 'security']
+
+if arch_subdir == 'x86'
+	sources += files('ixgbe_rxtx_vec_sse.c')
+elif arch_subdir == 'arm'
+	sources += files('ixgbe_rxtx_vec_neon.c')
+endif
+
+includes += include_directories('base')
+
+install_headers('rte_pmd_ixgbe.h')

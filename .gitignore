@@ -30,5 +30,5 @@ TAGS
 build
 build-*
 # ignore other build directory patterns
-*-gcc*
+#*-gcc*
 *-clang*

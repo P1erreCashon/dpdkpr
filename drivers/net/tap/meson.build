@@ -1,45 +1,39 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2018 Luca Boccassi <bluca@debian.org>
+# Copyright(c) 2017 Intel Corporation
 
-if not is_linux
-	build = false
-	reason = 'only supported on linux'
+if arch_subdir == 'riscv'
+    build = false
+    reason = 'not supported on RISC-V'
+    subdir_done()
 endif
+
+cflags += ['-DRTE_LIBRTE_IXGBE_BYPASS']
+
+subdir('base')
+objs = [base_objs]
+
 sources = files(
-	'rte_eth_tap.c',
-	'tap_bpf_api.c',
-	'tap_flow.c',
-	'tap_intr.c',
-	'tap_netlink.c',
-	'tap_tcmsgs.c',
+	'ixgbe_82599_bypass.c',
+	'ixgbe_bypass.c',
+	'ixgbe_ethdev.c',
+	'ixgbe_fdir.c',
+	'ixgbe_flow.c',
+	'ixgbe_ipsec.c',
+	'ixgbe_pf.c',
+	'ixgbe_rxtx.c',
+	'ixgbe_tm.c',
+	'ixgbe_vf_representor.c',
+	'rte_pmd_ixgbe.c'
 )
 
-deps = ['bus_vdev', 'gso', 'hash']
+deps += ['hash', 'security']
 
-cflags += '-DTAP_MAX_QUEUES=16'
+if arch_subdir == 'x86'
+	sources += files('ixgbe_rxtx_vec_sse.c')
+elif arch_subdir == 'arm'
+	sources += files('ixgbe_rxtx_vec_neon.c')
+endif
 
-# To maintain the compatibility with the make build system
-# tap_autoconf.h file is still generated.
-# input array for meson symbol search:
-# [ "MACRO to define if found", "header for the search",
-#   "enum/define", "symbol to search" ]
-#
-args = [
-	[ 'HAVE_TC_FLOWER', 'linux/pkt_cls.h',
-	  'TCA_FLOWER_UNSPEC' ],
-	[ 'HAVE_TC_VLAN_ID', 'linux/pkt_cls.h',
-	  'TCA_FLOWER_KEY_VLAN_PRIO' ],
-	[ 'HAVE_TC_BPF', 'linux/pkt_cls.h',
-	  'TCA_BPF_UNSPEC' ],
-	[ 'HAVE_TC_BPF_FD', 'linux/pkt_cls.h',
-	  'TCA_BPF_FD' ],
-	[ 'HAVE_TC_ACT_BPF', 'linux/tc_act/tc_bpf.h',
-	  'TCA_ACT_BPF_UNSPEC' ],
-	[ 'HAVE_TC_ACT_BPF_FD', 'linux/tc_act/tc_bpf.h',
-	  'TCA_ACT_BPF_FD' ],
-]
-config = configuration_data()
-foreach arg:args
-	config.set(arg[0], cc.has_header_symbol(arg[1], arg[2]))
-endforeach
-configure_file(output : 'tap_autoconf.h', configuration : config)
+includes += include_directories('base')
+
+install_headers('rte_pmd_ixgbe.h')

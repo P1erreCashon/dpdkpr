@@ -92,6 +92,8 @@ if machine == 'default'
 		machine = 'default'
 	elif host_machine.cpu_family().startswith('ppc')
 		machine = 'power8'
+	elif host_machine.cpu_family().startswith('riscv')
+		machine = 'riscv'
 	endif
 endif
 
