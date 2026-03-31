@@ -41,7 +41,7 @@ extern "C" {
 
 #define rte_cio_wmb()   asm volatile("fence ow, ow" ::: "memory")
 
-#define rte_cio_rmb()   asm volatile("fence ir, ir" ::: "memory")
+#define rte_cio_rmb()   asm volatile("fence ir, iorw" ::: "memory")
 
 static __rte_always_inline void
 rte_atomic_thread_fence(int memorder)
