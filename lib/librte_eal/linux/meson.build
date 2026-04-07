@@ -23,5 +23,5 @@ sources += files(
 
 deps += ['kvargs', 'telemetry']
 if has_libnuma == 1
-	dpdk_conf.set10('RTE_EAL_NUMA_AWARE_HUGEPAGES', true)
+	dpdk_conf.set10('RTE_EAL_NUMA_AWARE_HUGEPAGES', false)
 endif
